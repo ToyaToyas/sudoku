@@ -2,9 +2,11 @@ package sudoku;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
+import sudoku.StopwatchLabel;
 
 public class GameBoardPanel extends JPanel {
     private static final long serialVersionUID = 1L;  // to prevent serial warning
+    
 
     // Define named constants for UI sizes
     public static final int CELL_SIZE = 60;   // Cell width/height in pixels
@@ -20,6 +22,7 @@ public class GameBoardPanel extends JPanel {
     private int startLevel = 1;
     public int currentLevel = startLevel; // To track the current level
     public Difficulty currentDifficulty;
+    StopwatchLabel stopwatchLabel = new StopwatchLabel();
 
     private PuzzleSolvedListener puzzleSolvedListener;
 
@@ -49,6 +52,20 @@ public class GameBoardPanel extends JPanel {
         }
         super.setPreferredSize(new Dimension(BOARD_WIDTH, BOARD_HEIGHT));
     }
+    public int calculateProgress() {
+        int totalCells = SudokuConstants.GRID_SIZE * SudokuConstants.GRID_SIZE;
+        int filledCells = 0;
+
+        for (int row = 0; row < SudokuConstants.GRID_SIZE; ++row) {
+            for (int col = 0; col < SudokuConstants.GRID_SIZE; ++col) {
+                if (cells[row][col].status == CellStatus.CORRECT_GUESS) {
+                    filledCells++;
+                }
+            }
+        }
+
+        return (int) ((double) filledCells / totalCells * 100);
+    }
     public void setPuzzleSolvedListener(PuzzleSolvedListener listener) {
         this.puzzleSolvedListener = listener;
     }
@@ -58,6 +75,7 @@ public class GameBoardPanel extends JPanel {
      */
     public void newGame(Difficulty startDiff){
         newGame(startLevel, startDiff);
+        stopwatchLabel.resetTimer();
     }
     public void newGame(int level, Difficulty difficulty) {
         // Generate a new puzzle
@@ -122,6 +140,7 @@ public class GameBoardPanel extends JPanel {
              *   by calling isSolved(). Put up a congratulation JOptionPane, if so.
              */
             if (isSolved()) {
+                stopwatchLabel.stopTimer();
                 JOptionPane.showMessageDialog(null,"Puzzle Solved");
                 puzzleSolvedListener.onPuzzleSolved();
             }
