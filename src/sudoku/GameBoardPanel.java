@@ -161,8 +161,8 @@ public class GameBoardPanel extends JPanel {
         }
     }
     private boolean isInSubGrid(int row, int col, Cell sourceCell) {
-        int subGridRow = sourceCell.row - (sourceCell.row%3);
-        int subGridCol = sourceCell.col - (sourceCell.col%3);
+        int subGridRow = sourceCell.row - (sourceCell.row % 3);
+        int subGridCol = sourceCell.col - (sourceCell.col % 3);
         return row >= subGridRow && row < subGridRow + 3 && col >= subGridCol && col < subGridCol + 3;
     }
 }
