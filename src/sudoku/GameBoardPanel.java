@@ -17,6 +17,11 @@ public class GameBoardPanel extends JPanel {
     private Cell[][] cells = new Cell[SudokuConstants.GRID_SIZE][SudokuConstants.GRID_SIZE];
     /** It also contains a Puzzle with array numbers and isGiven */
     private Puzzle puzzle = new Puzzle();
+    private int startLevel = 1;
+    public int currentLevel = startLevel; // To track the current level
+    public Difficulty currentDifficulty;
+
+    private PuzzleSolvedListener puzzleSolvedListener;
 
     /** Constructor */
     public GameBoardPanel() {
@@ -44,14 +49,22 @@ public class GameBoardPanel extends JPanel {
         }
         super.setPreferredSize(new Dimension(BOARD_WIDTH, BOARD_HEIGHT));
     }
-
+    public void setPuzzleSolvedListener(PuzzleSolvedListener listener) {
+        this.puzzleSolvedListener = listener;
+    }
     /**
      * Generate a new puzzle; and reset the game board of cells based on the puzzle.
      * You can call this method to start a new game.
      */
-    public void newGame() {
+    public void newGame(Difficulty startDiff){
+        newGame(startLevel, startDiff);
+    }
+    public void newGame(int level, Difficulty difficulty) {
         // Generate a new puzzle
-        puzzle.newPuzzle(2);
+
+        currentLevel = level;
+        currentDifficulty = difficulty;
+        puzzle.newPuzzle(level, currentDifficulty);
 
         // Initialize all the 9x9 cells, based on the puzzle.
         for (int row = 0; row < SudokuConstants.GRID_SIZE; ++row) {
@@ -100,7 +113,8 @@ public class GameBoardPanel extends JPanel {
             } else {
                 sourceCell.status = CellStatus.WRONG_GUESS;
             }
-            sourceCell.paint();   // re-paint this cell based on its status
+
+            highlightConflictingCells(sourceCell, numberIn);
 
             /*
              * [TODO 6] (later)
@@ -109,7 +123,46 @@ public class GameBoardPanel extends JPanel {
              */
             if (isSolved()) {
                 JOptionPane.showMessageDialog(null,"Puzzle Solved");
+                puzzleSolvedListener.onPuzzleSolved();
             }
         }
+    }
+    public interface PuzzleSolvedListener {
+        void onPuzzleSolved();
+    }
+    private void highlightConflictingCells(Cell sourceCell, int numberIn) {
+        // Clear previous conflict highlights
+        clearConflictingHighlights();
+
+        // Highlight conflicting cells in the same row, column, and sub-grid
+        for (int row = 0; row < SudokuConstants.GRID_SIZE; ++row) {
+            for (int col = 0; col < SudokuConstants.GRID_SIZE; ++col) {
+                //skip its own cell as it cannot conflict with itself
+                if (row == sourceCell.row && col == sourceCell.col) {
+                    continue;
+                }
+                // Check the row and column for conflicts
+                if (cells[row][col].getText().equals(String.valueOf(numberIn))&&(row == sourceCell.row || col == sourceCell.col)) {
+                    // Highlight the conflicting cell
+                    cells[row][col].setBackground(Color.YELLOW); // Change this color as needed
+                }
+                if(isInSubGrid(row, col, sourceCell)&&cells[row][col].getText().equals(String.valueOf(numberIn))){
+                    cells[row][col].setBackground(Color.YELLOW);
+                }
+            }
+        }
+    }
+    private void clearConflictingHighlights() {
+        // Reset all cells to default color
+        for (int row = 0; row < SudokuConstants.GRID_SIZE; ++row) {
+            for (int col = 0; col < SudokuConstants.GRID_SIZE; ++col) {
+                cells[row][col].paint();  // Reset background color
+            }
+        }
+    }
+    private boolean isInSubGrid(int row, int col, Cell sourceCell) {
+        int subGridRow = sourceCell.row - (sourceCell.row%3);
+        int subGridCol = sourceCell.col - (sourceCell.col%3);
+        return row >= subGridRow && row < subGridRow + 3 && col >= subGridCol && col < subGridCol + 3;
     }
 }
