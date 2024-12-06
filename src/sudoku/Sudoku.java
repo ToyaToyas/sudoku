@@ -1,7 +1,6 @@
 package sudoku;
 import java.awt.*;
 import javax.swing.*;
-import java.awt.event.ActionEvent;
 /**
  * The main Sudoku program
  */

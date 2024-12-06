@@ -238,9 +238,9 @@ public class GameBoardPanel extends JPanel {
 
     // Update the status bar
     public void updateStatusBar() {
-            int remainingCells = calculateRemainingCells();
-            statusBar.setText("Cells remaining: " + remainingCells);
-        }
+        int remainingCells = calculateRemainingCells();
+        statusBar.setText("Cells remaining: " + remainingCells);
+    }
 
     private void showHint() {
         for (int row = 0; row < SudokuConstants.GRID_SIZE; ++row) {
