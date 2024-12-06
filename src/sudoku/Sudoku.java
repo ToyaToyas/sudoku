@@ -15,15 +15,6 @@ import javax.swing.*;
  */
 public class Sudoku extends JFrame {
     private static final long serialVersionUID = 1L;  // to prevent serial warning
-    private void updateScore(int delta) {
-        score += delta;
-        scoreLabel.setText("Score: " + score);
-    }
-
-    private void resetScore() {
-        score = 0;
-        scoreLabel.setText("Score: 0");
-    }
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(Sudoku::new);
@@ -34,10 +25,8 @@ public class Sudoku extends JFrame {
     
 
     // private variables
-    
-    private int score = 0;
+
     private JLabel scoreLabel = new JLabel("Score: 0");
-    private JProgressBar progressBar = new JProgressBar(0, 100);
     private JComboBox<Difficulty> difficultyComboBox;
     private GameBoardPanel board = new GameBoardPanel();
     private JButton btnNextLevel = new JButton("Next Level");
@@ -85,14 +74,17 @@ public class Sudoku extends JFrame {
             board.stopwatchLabel.startTimer(); // Resume the timer
             btnResume.setEnabled(false);       // Disable Resume button
             btnPause.setEnabled(true);         // Enable Pause button
-        });        
+        });
         btnNextLevel.addActionListener(e -> {
-            currentDifficulty = getNextDifficulty(currentDifficulty); // Tingkatkan level
-            board.newGame(currentDifficulty); // Mulai game baru dengan level berikutnya
-            board.stopwatchLabel.startTimer(); // Memastikan timer berjalan
-            btnNextLevel.setEnabled(false);   // Nonaktifkan tombol hingga teka-teki selesai
-            difficultyComboBox.setSelectedItem(currentDifficulty);
-            System.out.println("Level changed to: " + currentDifficulty); // Debug log
+            int currentLevel = board.currentLevel;
+            if (currentLevel < 5) {
+                board.newGame(currentLevel + 1, board.currentDifficulty); // Start a new game with the next level
+                board.stopwatchLabel.startTimer(); // Ensure the timer is running
+                btnNextLevel.setEnabled(false);   // Disable the button until the puzzle is solved
+            } else {
+                JOptionPane.showMessageDialog(this, "You have reached the maximum level!", "Level 5", JOptionPane.INFORMATION_MESSAGE);
+                btnNextLevel.setEnabled(false); // Disable "Next Level" when level 5 is reached
+            }
         });
         btnHint.addActionListener(e -> {
             board.showHint();  // Show a hint
@@ -126,7 +118,6 @@ public class Sudoku extends JFrame {
         newGameItem.addActionListener(e ->{
             Difficulty selectedDifficulty = (Difficulty) difficultyComboBox.getSelectedItem();
             board.newGame(selectedDifficulty);
-            resetScore(); // Reset skor
             board.stopwatchLabel.startTimer(); // Memastikan timer berjalan
         });
     
@@ -163,18 +154,6 @@ public class Sudoku extends JFrame {
         menuBar.add(helpMenu);
 
         return menuBar;
-    }
-    private void startNewGame() {
-        Difficulty selectedDifficulty = (Difficulty) difficultyComboBox.getSelectedItem();
-        board.newGame(selectedDifficulty); // Memulai permainan baru
-        resetScore(); // Reset skor
-        board.stopwatchLabel.startTimer(); // Mulai timer
-        JOptionPane.showMessageDialog(this, "Starting a new game!", "New Game", JOptionPane.INFORMATION_MESSAGE);
-    }
-
-    private void resetGame() {
-        board.newGame(board.currentLevel, board.currentDifficulty);
-        JOptionPane.showMessageDialog(this, "Game has been reset!", "Reset Game", JOptionPane.INFORMATION_MESSAGE);
     }
     private Difficulty getNextDifficulty(Difficulty currentDifficulty) {
         switch (currentDifficulty) {
