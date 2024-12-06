@@ -129,7 +129,9 @@ public class Sudoku extends JFrame {
             board.stopwatchLabel.startTimer();
     });
     
-        
+    exitItem.addActionListener(e-> {
+            System.exit(0);
+    });
         
 
         fileMenu.add(newGameItem);
