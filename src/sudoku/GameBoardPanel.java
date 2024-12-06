@@ -6,7 +6,7 @@ import sudoku.StopwatchLabel;
 
 public class GameBoardPanel extends JPanel {
     private static final long serialVersionUID = 1L;  // to prevent serial warning
-    
+
 
     // Define named constants for UI sizes
     public static final int CELL_SIZE = 60;   // Cell width/height in pixels
