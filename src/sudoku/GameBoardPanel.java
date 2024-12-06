@@ -26,7 +26,7 @@ public class GameBoardPanel extends JPanel {
     /**
      * The game board composes of 9x9 Cells (customized JTextFields)
      */
-    private Cell[][] cells = new Cell[SudokuConstants.GRID_SIZE][SudokuConstants.GRID_SIZE];
+    public Cell[][] cells = new Cell[SudokuConstants.GRID_SIZE][SudokuConstants.GRID_SIZE];
     /**
      * It also contains a Puzzle with array numbers and isGiven
      */
@@ -139,6 +139,9 @@ public class GameBoardPanel extends JPanel {
 
             highlightConflictingCells(sourceCell, numberIn);
 
+            // Update the progress bar after every action
+            updateProgressBar();
+
             /*
              * [TODO 6] (later)
              * Check if the player has solved the puzzle after this move,
@@ -147,8 +150,12 @@ public class GameBoardPanel extends JPanel {
             if (isSolved()) {
                 stopwatchLabel.stopTimer();
                 JOptionPane.showMessageDialog(null, "Puzzle Solved");
+
                 puzzleSolvedListener.onPuzzleSolved();
             }
+        }
+
+        private void updateProgressBar() {
         }
     }
 

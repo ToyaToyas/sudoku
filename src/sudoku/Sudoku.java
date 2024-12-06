@@ -36,6 +36,7 @@ public class Sudoku extends JFrame {
     // private variables
     
     private int score = 0;
+    private JMenu helpMenu;
     private JLabel scoreLabel = new JLabel("Score: 0");
     private JProgressBar progressBar = new JProgressBar(0, 100);
     private JComboBox<Difficulty> difficultyComboBox;
@@ -44,6 +45,9 @@ public class Sudoku extends JFrame {
     private JButton btnPause = new JButton("Pause Timer");
     private JButton btnResume = new JButton("Resume Timer");
     private JButton btnHint = new JButton("Hint");
+    private String playerName = "Player";
+    private int bestScore = Integer.MAX_VALUE;
+
 
     // Constructor
     public Sudoku() {
@@ -54,7 +58,6 @@ public class Sudoku extends JFrame {
         stopwatchPanel.add(btnPause);
         stopwatchPanel.add(btnResume);
         stopwatchPanel.add(btnHint);
-        
 
         cp.add(stopwatchPanel, BorderLayout.NORTH);
 
@@ -72,6 +75,9 @@ public class Sudoku extends JFrame {
         bottomPanel.add(panelSouth);
         // Add Menu Bar
         cp.add(panelSouth, BorderLayout.SOUTH);
+        progressBar = new JProgressBar(0, 100);
+        progressBar.setValue(0);
+        panelSouth.add(progressBar);
         // Add Menu Bar
         setJMenuBar(createMenuBar());
     
@@ -113,7 +119,7 @@ public class Sudoku extends JFrame {
         setVisible(true);
         
     }
-    
+
     private JMenuBar createMenuBar() {
         JMenuBar menuBar = new JMenuBar();
 
@@ -122,24 +128,25 @@ public class Sudoku extends JFrame {
         JMenuItem newGameItem = new JMenuItem("New Game");
         JMenuItem resetGameItem = new JMenuItem("Reset Game");
         JMenuItem exitItem = new JMenuItem("Exit");
+        JMenuItem highScoresItem = new JMenuItem("View High Scores");
+        highScoresItem.addActionListener(e -> showHighScores());
 
-        newGameItem.addActionListener(e ->{
+        newGameItem.addActionListener(e -> {
             Difficulty selectedDifficulty = (Difficulty) difficultyComboBox.getSelectedItem();
             board.newGame(selectedDifficulty);
-            resetScore(); // Reset skor
-            board.stopwatchLabel.startTimer(); // Memastikan timer berjalan
+            resetScore(); // Reset the score
+            board.stopwatchLabel.startTimer(); // Ensure the timer starts
         });
-    
+
         resetGameItem.addActionListener(e -> {
             board.stopwatchLabel.resetTimer();
             board.newGame(board.currentLevel, board.currentDifficulty);
             board.stopwatchLabel.startTimer();
-    });
-    
-    exitItem.addActionListener(e-> {
+        });
+
+        exitItem.addActionListener(e -> {
             System.exit(0);
-    });
-        
+        });
 
         fileMenu.add(newGameItem);
         fileMenu.add(resetGameItem);
@@ -151,11 +158,12 @@ public class Sudoku extends JFrame {
         JMenuItem changeDifficultyItem = new JMenuItem("Change Difficulty");
 
         // Help Menu
-        JMenu helpMenu = new JMenu("Help");
+        JMenu helpMenu = new JMenu("Help"); // Initialize the Help menu here
         JMenuItem aboutItem = new JMenuItem("About");
 
         aboutItem.addActionListener(e -> showAboutDialog());
-        helpMenu.add(aboutItem);
+        helpMenu.add(aboutItem); // Add About item to Help menu
+        helpMenu.add(highScoresItem); // Add High Scores item to Help menu
 
         // Add menus to menu bar
         menuBar.add(fileMenu);
@@ -164,6 +172,20 @@ public class Sudoku extends JFrame {
 
         return menuBar;
     }
+
+
+    private void updateHighScore(int score) {
+        if (score < bestScore) {
+            bestScore = score;
+            JOptionPane.showMessageDialog(this, "New High Score! Time: " + score + " seconds");
+        }
+    }
+
+    public void showHighScores() {
+        JOptionPane.showMessageDialog(this, "Best Score: " + bestScore + " seconds by " + playerName, "High Score", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+
     private void startNewGame() {
         Difficulty selectedDifficulty = (Difficulty) difficultyComboBox.getSelectedItem();
         board.newGame(selectedDifficulty); // Memulai permainan baru
@@ -176,6 +198,19 @@ public class Sudoku extends JFrame {
         board.newGame(board.currentLevel, board.currentDifficulty);
         JOptionPane.showMessageDialog(this, "Game has been reset!", "Reset Game", JOptionPane.INFORMATION_MESSAGE);
     }
+
+    private void updateProgressBar() {
+        int filledCells = 0;
+        for (int row = 0; row < SudokuConstants.GRID_SIZE; ++row) {
+            for (int col = 0; col < SudokuConstants.GRID_SIZE; ++col) {
+                if (!board.cells[row][col].getText().isEmpty()) {
+                    filledCells++;
+                }
+            }
+        }
+        progressBar.setValue((int) ((double) filledCells / (SudokuConstants.GRID_SIZE * SudokuConstants.GRID_SIZE) * 100));
+    }
+
     private Difficulty getNextDifficulty(Difficulty currentDifficulty) {
         switch (currentDifficulty) {
             case Easy:
@@ -187,7 +222,8 @@ public class Sudoku extends JFrame {
                 return Difficulty.Easy; // Tetap di Hard jika sudah di level terakhir
         }
     }
+
     private void showAboutDialog() {
-        JOptionPane.showMessageDialog(this, "Sudoku Game v1.0\nDeveloped by [Your Name]", "About", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, "Sudoku Game v1.0\nDeveloped by [Kelompok 2]", "About", JOptionPane.INFORMATION_MESSAGE);
     }
 }
