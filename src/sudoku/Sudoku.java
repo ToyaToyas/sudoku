@@ -48,8 +48,8 @@ public class Sudoku extends JFrame {
     private JButton btnNextLevel = new JButton("Next Level");
     private JButton btnPause = new JButton("Pause Timer");
     private JButton btnResume = new JButton("Resume Timer");
-    private JButton btnNewGame = new JButton("New Game");
-    private JButton btnResetGame = new JButton("Reset Game");
+    private JButton btnHint = new JButton("Hint");
+
     // Constructor
     public Sudoku() {
         Container cp = getContentPane();
@@ -58,6 +58,7 @@ public class Sudoku extends JFrame {
         stopwatchPanel.add(board.stopwatchLabel);
         stopwatchPanel.add(btnPause);
         stopwatchPanel.add(btnResume);
+        stopwatchPanel.add(btnHint);
         
 
         cp.add(stopwatchPanel, BorderLayout.NORTH);
@@ -97,6 +98,9 @@ public class Sudoku extends JFrame {
             btnNextLevel.setEnabled(false);   // Nonaktifkan tombol hingga teka-teki selesai
             difficultyComboBox.setSelectedItem(currentDifficulty);
             System.out.println("Level changed to: " + currentDifficulty); // Debug log
+        });
+        btnHint.addActionListener(e -> {
+            board.showHint();  // Show a hint
         });
         
         btnNextLevel.setEnabled(false); // Initially disabled

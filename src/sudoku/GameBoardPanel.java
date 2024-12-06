@@ -11,7 +11,6 @@ package sudoku;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
-import sudoku.StopwatchLabel;
 
 public class GameBoardPanel extends JPanel {
     private static final long serialVersionUID = 1L;  // to prevent serial warning
@@ -38,16 +37,12 @@ public class GameBoardPanel extends JPanel {
     StopwatchLabel stopwatchLabel = new StopwatchLabel();
 
     private PuzzleSolvedListener puzzleSolvedListener;
-    private JTextField statusBar;
-    private JButton hintsButton;
-
 
     /**
      * Constructor
      */
     public GameBoardPanel() {
         super.setLayout(new GridLayout(SudokuConstants.GRID_SIZE, SudokuConstants.GRID_SIZE));  // JPanel
-        super.setLayout(new BorderLayout());
 
         // Allocate the 2D array of Cell, and added into JPanel.
         for (int row = 0; row < SudokuConstants.GRID_SIZE; ++row) {
@@ -70,35 +65,6 @@ public class GameBoardPanel extends JPanel {
             }
         }
         super.setPreferredSize(new Dimension(BOARD_WIDTH, BOARD_HEIGHT));
-
-        // Create the game board (keeping the GridLayout for cells)
-        JPanel boardPanel = new JPanel(new GridLayout(SudokuConstants.GRID_SIZE, SudokuConstants.GRID_SIZE));
-
-        for (int row = 0; row < SudokuConstants.GRID_SIZE; ++row) {
-            for (int col = 0; col < SudokuConstants.GRID_SIZE; ++col) {
-                cells[row][col] = new Cell(row, col);
-                boardPanel.add(cells[row][col]);
-            }
-        }
-
-        // Add the game board to the center of the BorderLayout
-        this.add(boardPanel, BorderLayout.CENTER);
-
-        // Create and add the status bar to the South
-        statusBar = new JTextField("Welcome to Sudoku!");
-        statusBar.setEditable(false);
-        statusBar.setHorizontalAlignment(JTextField.CENTER);
-        this.add(statusBar, BorderLayout.SOUTH);
-
-        // Create and add hint button
-        hintsButton = new JButton("Hint");
-        hintsButton.addActionListener(e -> showHint());
-
-        // Add the hint button to the control panel
-        JPanel controlPanel = new JPanel();
-        controlPanel.add(hintsButton);
-        this.add(controlPanel, BorderLayout.NORTH);
-
     }
 
     public int calculateProgress() {
@@ -180,8 +146,10 @@ public class GameBoardPanel extends JPanel {
              */
             if (numberIn == sourceCell.number) {
                 sourceCell.status = CellStatus.CORRECT_GUESS;
+                sourceCell.paint();
             } else {
                 sourceCell.status = CellStatus.WRONG_GUESS;
+                sourceCell.paint();
             }
 
             highlightConflictingCells(sourceCell, numberIn);
@@ -240,27 +208,20 @@ public class GameBoardPanel extends JPanel {
         int subGridCol = sourceCell.col - (sourceCell.col % 3);
         return row >= subGridRow && row < subGridRow + 3 && col >= subGridCol && col < subGridCol + 3;
     }
-
-    private int calculateRemainingCells() {
-        return 0;
-    }
-
-    // Update the status bar
-    public void updateStatusBar() {
-        int remainingCells = calculateRemainingCells();
-        statusBar.setText("Cells remaining: " + remainingCells);
-    }
-
-    private void showHint() {
+    public void showHint() {
+        // Iterate through all cells to find an empty one
         for (int row = 0; row < SudokuConstants.GRID_SIZE; ++row) {
             for (int col = 0; col < SudokuConstants.GRID_SIZE; ++col) {
+                // Check if the cell is editable and is currently empty
                 if (cells[row][col].isEditable() && cells[row][col].getText().isEmpty()) {
-                    cells[row][col].setText(String.valueOf(puzzle.numbers[row][col])); // Fill the correct value
-                    cells[row][col].status = CellStatus.CORRECT_GUESS;  // Mark it as a correct guess
-                    repaint();  // Trigger repaint to show the hint
-                    return;
+                    // Reveal the correct number from the puzzle
+                    cells[row][col].setText(String.valueOf(puzzle.numbers[row][col]));
+                    return; // Exit after showing the first available hint
                 }
             }
         }
+        // If no empty cell found, show a message (optional)
+        JOptionPane.showMessageDialog(this, "No more hints available!", "Hint", JOptionPane.INFORMATION_MESSAGE);
     }
+
 }
