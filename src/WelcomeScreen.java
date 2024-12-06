@@ -22,14 +22,12 @@ public class WelcomeScreen extends JFrame {
         int exitButtonHeight = 50;
         int exitButtonWidth = 50;
 
-        BufferedImage bgImage = ImageIO.read(new File("src/Assets/download1.png"));
         Image scaledBgImage = bgImage.getScaledInstance(screenSize.width, screenSize.height, Image.SCALE_SMOOTH);
         ImageIcon backgroundImage = new ImageIcon(scaledBgImage);
         JLabel background = new JLabel(backgroundImage);
         background.setIcon(backgroundImage);
         background.setHorizontalAlignment(JLabel.CENTER);
 
-        BufferedImage sudokuIcon = ImageIO.read(new File("src/Assets/sudokuButton.png"));
         Image sudokuImage = sudokuIcon.getScaledInstance(buttonWidth, buttonHeight, Image.SCALE_SMOOTH);
         ImageIcon scaledSudokuIcon = new ImageIcon(sudokuImage);
 
