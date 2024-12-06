@@ -6,68 +6,53 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class StopwatchLabel extends JLabel {
-
-    private long startTime;
-    private long elapsedPausedTime = 0; // Waktu yang terakumulasi saat timer dijeda
-    private boolean running = false; // Status timer
-    private Timer timer;
+    private Timer timer;          // Timer untuk mengupdate label
+    private long startTime;       // Waktu ketika timer dimulai
+    private long pausedTime;      // Menyimpan waktu ketika timer di-*pause*
+    private boolean isPaused;     // Status apakah timer sedang di-*pause*
 
     public StopwatchLabel() {
-        setFont(new Font("Arial", Font.PLAIN, 24));
-        setForeground(Color.BLACK);
-        timer = new Timer(1000, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                updateTime();
-            }
-        });
-        resetTimer(); // Inisialisasi timer
-    }
-
-    private void updateTime() {
-        if (running) {
-            long currentTime = System.currentTimeMillis();
-            long timeGoesOn = currentTime - startTime + elapsedPausedTime;
-            String timeString = String.format("%02d:%02d", timeGoesOn / 1000 / 60, (timeGoesOn / 1000) % 60);
-            setText(timeString);
-        }
+        setText("00:00:00");  // Default tampilan waktu
+        timer = new Timer(1000, new TimerListener()); // Update setiap detik
     }
 
     public void startTimer() {
-        if (!running) {
+        if (isPaused) {
+            // Lanjutkan dari waktu terakhir di-*pause*
+            startTime = System.currentTimeMillis() - pausedTime;
+            isPaused = false;
+        } else {
+            // Mulai timer baru
             startTime = System.currentTimeMillis();
-            timer.start();
-            running = true;
         }
-    }
-
-    public void pauseTimer() {
-        if (running) {
-            elapsedPausedTime += System.currentTimeMillis() - startTime;
-            timer.stop();
-            running = false;
-        }
-    }
-
-    public void resumeTimer() {
-        if (!running) {
-            startTime = System.currentTimeMillis();
-            timer.start();
-            running = true;
-        }
+        timer.start();
     }
 
     public void stopTimer() {
+        if (!isPaused) {
+            // Simpan waktu sebelum di-*pause*
+            pausedTime = System.currentTimeMillis() - startTime;
+            isPaused = true;
+        }
         timer.stop();
-        running = false;
     }
 
     public void resetTimer() {
-        stopTimer();
-        elapsedPausedTime = 0;
-        setText("00:00");
+        timer.stop();
+        startTime = 0;
+        pausedTime = 0;
+        isPaused = false;
+        setText("00:00:00");
     }
 
-    public boolean isRunning() {
-        return running;
+    private class TimerListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            long elapsed = System.currentTimeMillis() - startTime;
+            int hours = (int) (elapsed / 3600000);
+            int minutes = (int) ((elapsed % 3600000) / 60000);
+            int seconds = (int) ((elapsed % 60000) / 1000);
+            setText(String.format("%02d:%02d:%02d", hours, minutes, seconds));
+        }
     }
 }
