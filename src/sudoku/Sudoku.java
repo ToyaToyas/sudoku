@@ -25,11 +25,6 @@ public class Sudoku extends JFrame {
         scoreLabel.setText("Score: 0");
     }
 
-    private void updateProgress() {
-        int progress = board.calculateProgress();
-        progressBar.setValue(progress);
-    }
-
     public static void main(String[] args) {
         SwingUtilities.invokeLater(Sudoku::new);
     }

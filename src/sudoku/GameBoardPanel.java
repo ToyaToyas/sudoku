@@ -67,21 +67,6 @@ public class GameBoardPanel extends JPanel {
         super.setPreferredSize(new Dimension(BOARD_WIDTH, BOARD_HEIGHT));
     }
 
-    public int calculateProgress() {
-        int totalCells = SudokuConstants.GRID_SIZE * SudokuConstants.GRID_SIZE;
-        int filledCells = 0;
-
-        for (int row = 0; row < SudokuConstants.GRID_SIZE; ++row) {
-            for (int col = 0; col < SudokuConstants.GRID_SIZE; ++col) {
-                if (cells[row][col].status == CellStatus.CORRECT_GUESS) {
-                    filledCells++;
-                }
-            }
-        }
-
-        return (int) ((double) filledCells / totalCells * 100);
-    }
-
     public void setPuzzleSolvedListener(PuzzleSolvedListener listener) {
         this.puzzleSolvedListener = listener;
     }
