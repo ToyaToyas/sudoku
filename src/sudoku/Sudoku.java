@@ -24,6 +24,19 @@ public class Sudoku extends JFrame {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(Sudoku::new);
     }
+    private Difficulty currentDifficulty = Difficulty.Easy; // Mulai dari Easy
+    private Difficulty getNextDifficulty(Difficulty currentDifficulty) {
+        switch (currentDifficulty) {
+            case Easy:
+                return Difficulty.Intermediate;
+            case Intermediate:
+                return Difficulty.Hard;
+            case Hard:
+            default:
+                return Difficulty.Hard; // Tetap di Hard jika sudah di level terakhir
+        }
+    }
+    
     
 
     // private variables
@@ -76,12 +89,26 @@ public class Sudoku extends JFrame {
             board.newGame(board.currentLevel, board.currentDifficulty);
             board.stopwatchLabel.startTimer();
         });
-        btnPause.addActionListener(e -> board.stopwatchLabel.stopTimer());
-        btnResume.addActionListener(e -> board.stopwatchLabel.startTimer());
-        btnNextLevel.addActionListener(e -> {
-            board.newGame(board.currentLevel+1, board.currentDifficulty);
-            btnNextLevel.setEnabled(false);
+        btnPause.addActionListener(e -> {
+            board.stopwatchLabel.stopTimer(); // Pause the timer
+            btnPause.setEnabled(false);       // Disable Pause button
+            btnResume.setEnabled(true);       // Enable Resume button
         });
+        
+        btnResume.addActionListener(e -> {
+            board.stopwatchLabel.startTimer(); // Resume the timer
+            btnResume.setEnabled(false);       // Disable Resume button
+            btnPause.setEnabled(true);         // Enable Pause button
+        });
+        btnNextLevel.addActionListener(e -> {
+            currentDifficulty = getNextDifficulty(currentDifficulty); // Tingkatkan level
+            board.newGame(currentDifficulty); // Mulai game baru dengan level berikutnya
+            board.stopwatchLabel.startTimer(); // Memastikan timer berjalan
+            btnNextLevel.setEnabled(false);   // Nonaktifkan tombol hingga teka-teki selesai
+            difficultyComboBox.setSelectedItem(currentDifficulty);
+            System.out.println("Level changed to: " + currentDifficulty); // Debug log
+        });
+        
         btnNextLevel.setEnabled(false); // Initially disabled
 
         // Add puzzle solved listener to enable the "Next Level" button
